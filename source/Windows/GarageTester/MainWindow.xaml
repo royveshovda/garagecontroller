@@ -1,0 +1,10 @@
+﻿<Window x:Class="GarageTester.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="141" Width="350">
+    <Grid Margin="0,0,2,2">
+        <Button x:Name="btnLeft" Content="Door 1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="155" Height="86" Click="btnLeft_Click"/>
+        <Button x:Name="btnRight" Content="Door 2" HorizontalAlignment="Left" Margin="170,10,0,0" VerticalAlignment="Top" Width="155" Height="86" Click="btnRight_Click"/>
+
+    </Grid>
+</Window>

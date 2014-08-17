@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GarageController.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="RabbitMqHostname" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">rv-broker.cloudapp.net</Value>
+    </Setting>
+    <Setting Name="RabbitMqUsername" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">garage</Value>
+    </Setting>
+    <Setting Name="RabbitMqPassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">GoGoGarage64</Value>
+    </Setting>
+    <Setting Name="RabbitMqHeartbeatExchange" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Heartbeat</Value>
+    </Setting>
+    <Setting Name="RabbitMqQueue" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">GarageKorvettveien7</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

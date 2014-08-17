@@ -1,0 +1,19 @@
+﻿package GarageDoors;
+
+import "google/protobuf/csharp_options.proto";
+
+//option (google.protobuf.csharp_file_options).namespace = "Eycarus.ProtocolBuffers.typelibrary";
+//option (google.protobuf.csharp_file_options).umbrella_classname = "ToggleDoorCommand";
+
+option java_package = "com.eycarus.typelibrary";
+option java_outer_classname = "EycarusTypes";
+
+option optimize_for = SPEED;
+
+message ToggleDoorCommand {
+	required string SessionId = 1;
+	required int32 DoorNumber = 2;
+	required int64 Created = 3;
+	optional int64 Expiry = 4;
+	required string Signature = 5;
+}
