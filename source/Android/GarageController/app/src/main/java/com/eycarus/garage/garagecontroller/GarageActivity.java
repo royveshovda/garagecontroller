@@ -83,12 +83,14 @@ public class GarageActivity extends Activity {
         factory.setPort(5672);
         //factory.setRequestedHeartbeat(30);
 
+        GarageControllerMessages.ToggleDoorCommand msg = GarageControllerMessages.ToggleDoorCommand.newBuilder().setDoorNumber(buttonNumber).build();
+        byte[] body = msg.toByteArray();
 
         try {
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
-            String message = "Door " + buttonNumber;
-            channel.basicPublish("", "GarageKorvettveien7",null,message.getBytes());
+            //String message = "Door " + buttonNumber;
+            channel.basicPublish("", "GarageKorvettveien7",null,body);
             channel.close();
             connection.close();
         } catch (Exception e) {

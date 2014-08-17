@@ -1,15 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 'android-L'
-    buildToolsVersion "20.0.0"
-
+    compileSdkVersion 19
+    buildToolsVersion '20.0.0'
     defaultConfig {
-        applicationId "com.eycarus.garage.garagecontroller"
+        applicationId 'com.eycarus.garage.garagecontroller'
         minSdkVersion 19
-        targetSdkVersion 'L'
+        targetSdkVersion 19
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
     buildTypes {
         release {
@@ -17,12 +16,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
     compile 'com.rabbitmq:amqp-client:3.3.5'
-
     compile 'com.google.protobuf:protobuf-java:2.5.0'
 }

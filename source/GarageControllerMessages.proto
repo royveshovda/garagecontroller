@@ -1,0 +1,7 @@
+message ToggleDoorCommand {
+   optional string SessionId = 1;
+   optional int32 DoorNumber = 2 [default = 0];
+   optional int64 Created = 3 [default = 0];
+   optional int64 Expiry = 4;
+   optional string Signature = 5;
+}
