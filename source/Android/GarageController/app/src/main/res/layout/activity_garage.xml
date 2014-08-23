@@ -15,30 +15,36 @@
         android:text="Control garage doors"
         android:textAlignment="center"/>
 
-    <Button
-        android:id="@+id/button_left"
+
+    <GridLayout
+        android:layout_marginTop="50px"
         android:layout_width="match_parent"
-        android:layout_height="200px"
-        android:text="LEFT"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="50dp"
-        android:enabled="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:textAlignment="textStart" />
-    
-    <Button
-        android:id="@+id/button_right"
-        android:layout_width="match_parent"
-        android:layout_height="200px"
-        android:text="RIGHT"
-        android:layout_below="@+id/button_left"
-        android:layout_alignParentStart="true"
-        android:enabled="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:textAlignment="textEnd"/>
+        android:layout_height="match_parent">
+        <Button
+            android:id="@+id/button_left"
+            android:layout_width="250px"
+            android:layout_height="200px"
+            android:text="LEFT"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:enabled="true"
+            android:textAlignment="textStart" />
+
+        <Button
+            android:id="@+id/button_right"
+            android:layout_width="250px"
+            android:layout_height="200px"
+            android:text="RIGHT"
+            android:layout_alignParentStart="true"
+            android:enabled="true"
+            android:textAlignment="textEnd"/>
+
+        </GridLayout>
+
+
+
+
+
 
 
 </RelativeLayout>
