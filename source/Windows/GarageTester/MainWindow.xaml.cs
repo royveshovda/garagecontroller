@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using GarageController;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace GarageTester
@@ -18,20 +19,38 @@ namespace GarageTester
         private string _hostName;
         private string _username;
         private string _password;
+        private string _exchangeName;
+        private string _routingKey;
+
         private ushort _heartbeatInterval = 30;
 
         public MainWindow()
         {
-            //_hostName = "192.168.77.106";
-            _hostName = "rv-broker.cloudapp.net";
-            _username = "tester";
-            _password = "GoGoTester";
+            const string filename = "D:\\Config\\GarageController\\testapp.config.json";
+            var config = GetConfig(filename);
+
+            _hostName = config.RabbitMqHost;
+            _username = config.RabbitMqUsername;
+            _password = config.RabbitPassword;
+            _heartbeatInterval = config.RabbitHearBeatIntervalInSeconds;
+            _exchangeName = config.RabbitMqExchangeName;
+            _routingKey = config.RabbitMqRoutingKey;
 
             InitializeComponent();
 
             InitializeRabbitMq();
 
 
+        }
+
+        private static Config GetConfig(string filename)
+        {
+            if(!File.Exists(filename)) throw new FileNotFoundException();
+
+            var raw = File.ReadAllText(filename);
+            var config = JsonConvert.DeserializeObject<Config>(raw);
+
+            return config;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -89,7 +108,7 @@ namespace GarageTester
             {
                 var messageBody = SerializeToggleDoorCommand(command);
                 var messageProperties = GetMessageProperties(command.DoorNumber, command.GetType().Name);
-                _model.BasicPublish("", "GarageKorvettveien7", messageProperties, messageBody);
+                _model.BasicPublish(_exchangeName, _routingKey, messageProperties, messageBody);
             }
         }
 
