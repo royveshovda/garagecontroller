@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using GarageController;
+using GarageTester.Properties;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
@@ -16,29 +17,15 @@ namespace GarageTester
         private ConnectionFactory _connectionFactory;
         private IConnection _connection;
         private IModel _model;
-        private string _hostName;
-        private string _username;
-        private string _password;
-        private string _exchangeName;
-        private string _routingKey;
-
-        private ushort _heartbeatInterval = 30;
+        private readonly Config _config;
 
         public MainWindow()
         {
-            const string filename = "D:\\Config\\GarageController\\testapp.config.json";
-            var config = GetConfig(filename);
-
-            _hostName = config.RabbitMqHost;
-            _username = config.RabbitMqUsername;
-            _password = config.RabbitPassword;
-            _heartbeatInterval = config.RabbitHearBeatIntervalInSeconds;
-            _exchangeName = config.RabbitMqExchangeName;
-            _routingKey = config.RabbitMqRoutingKey;
-
+            var filename = Settings.Default.ConfigFilename;
+            _config = GetConfig(filename);
             InitializeComponent();
 
-            InitializeRabbitMq();
+            //InitializeRabbitMq();
 
 
         }
@@ -59,18 +46,18 @@ namespace GarageTester
             base.OnClosing(e);
         }
 
-        private void InitializeRabbitMq()
-        {
-            _connectionFactory = new ConnectionFactory
-            {
-                HostName = _hostName,
-                UserName = _username,
-                Password = _password,
-                RequestedHeartbeat = _heartbeatInterval,
-                //Ssl = ssl
-            };
+        //private void InitializeRabbitMq()
+        //{
+        //    _connectionFactory = new ConnectionFactory
+        //    {
+        //        HostName = _config.RabbitMqHost,
+        //        UserName = _config.RabbitMqUsername,
+        //        Password = _config.RabbitPassword,
+        //        RequestedHeartbeat = _config.RabbitHearBeatIntervalInSeconds,
+        //        //Ssl = ssl
+        //    };
 
-        }
+        //}
 
         private void btnLeft_Click(object sender, RoutedEventArgs e)
         {
@@ -108,13 +95,12 @@ namespace GarageTester
             {
                 var messageBody = SerializeToggleDoorCommand(command);
                 var messageProperties = GetMessageProperties(command.DoorNumber, command.GetType().Name);
-                _model.BasicPublish(_exchangeName, _routingKey, messageProperties, messageBody);
+                _model.BasicPublish(_config.RabbitMqExchangeName, _config.RabbitMqRoutingKey, messageProperties, messageBody);
             }
         }
 
         private static byte[] SerializeToggleDoorCommand(ToggleDoorCommand command)
         {
-            string proto = ProtoBuf.Serializer.GetProto<ToggleDoorCommand>();
             byte[] serialized;
             using (var mso = new MemoryStream())
             {
@@ -151,18 +137,28 @@ namespace GarageTester
 
         private bool Connect()
         {
-            //var ssl = new SslOption();
-            //ssl.Enabled = true;
-            //ssl.ServerName = _hostName;
-
-            _connectionFactory = new ConnectionFactory
+            if (_config.RabbitMqUseSsl)
             {
-                HostName = _hostName,
-                UserName = _username,
-                Password = _password,
-                RequestedHeartbeat = _heartbeatInterval,
-                //Ssl = ssl
-            };
+                var ssl = new SslOption {Enabled = true, ServerName = _config.RabbitMqHost};
+                _connectionFactory = new ConnectionFactory
+                {
+                    HostName = _config.RabbitMqHost,
+                    UserName = _config.RabbitMqUsername,
+                    Password = _config.RabbitPassword,
+                    RequestedHeartbeat = _config.RabbitHearBeatIntervalInSeconds,
+                    Ssl = ssl
+                };
+            }
+            else
+            {
+                _connectionFactory = new ConnectionFactory
+                {
+                    HostName = _config.RabbitMqHost,
+                    UserName = _config.RabbitMqUsername,
+                    Password = _config.RabbitPassword,
+                    RequestedHeartbeat = _config.RabbitHearBeatIntervalInSeconds,
+                };
+            }
 
             try
             {

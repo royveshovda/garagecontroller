@@ -60,6 +60,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="LongRunningProcess.cs" />
     <Compile Include="MessageHandler.cs" />
@@ -77,6 +78,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="config.json.example" />
     <None Include="ToggleDoorCommand.proto" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
