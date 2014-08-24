@@ -24,10 +24,6 @@ namespace GarageTester
             var filename = Settings.Default.ConfigFilename;
             _config = GetConfig(filename);
             InitializeComponent();
-
-            //InitializeRabbitMq();
-
-
         }
 
         private static Config GetConfig(string filename)
@@ -45,19 +41,6 @@ namespace GarageTester
             Disconnect();
             base.OnClosing(e);
         }
-
-        //private void InitializeRabbitMq()
-        //{
-        //    _connectionFactory = new ConnectionFactory
-        //    {
-        //        HostName = _config.RabbitMqHost,
-        //        UserName = _config.RabbitMqUsername,
-        //        Password = _config.RabbitPassword,
-        //        RequestedHeartbeat = _config.RabbitHearBeatIntervalInSeconds,
-        //        //Ssl = ssl
-        //    };
-
-        //}
 
         private void btnLeft_Click(object sender, RoutedEventArgs e)
         {
