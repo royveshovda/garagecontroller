@@ -39,6 +39,10 @@
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Phidget21.NET, Version=2.1.8.185, Culture=neutral, PublicKeyToken=c2b1f2a3594bce52, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\Phidget21.NET.dll</HintPath>
@@ -56,6 +60,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="LongRunningProcess.cs" />
     <Compile Include="MessageHandler.cs" />
@@ -73,6 +78,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="config.json.example" />
     <None Include="ToggleDoorCommand.proto" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

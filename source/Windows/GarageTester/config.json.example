@@ -1,0 +1,9 @@
+{
+  "RabbitMqHost":"broker.example.net",
+  "RabbitMqUseSsl":false,
+  "RabbitMqUsername":"test_sender",
+  "RabbitPassword":"test_sender123",
+  "RabbitHearBeatIntervalInSeconds":30,
+  "RabbitMqExchangeName":"",
+  "RabbitMqRoutingKey":"Garage1"
+}

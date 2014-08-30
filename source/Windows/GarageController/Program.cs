@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using GarageController.Properties;
 using log4net;
 using log4net.Config;
+using Newtonsoft.Json;
 
 namespace GarageController
 {
@@ -36,11 +39,12 @@ namespace GarageController
 
             var messageHandler = new MessageHandler();
 
-            var rabbitMqHostname = Properties.Settings.Default.RabbitMqHostname;
-            var rabbitMqUsername = Properties.Settings.Default.RabbitMqUsername;
-            var rabbitMqPassword = Properties.Settings.Default.RabbitMqPassword;
-            var rabbitMqQueueName = Properties.Settings.Default.RabbitMqQueue;
-            var worker = new QueueWorker(rabbitMqHostname, rabbitMqUsername, rabbitMqPassword, rabbitMqQueueName, messageHandler.HandleCommand, log);
+            var filename = Settings.Default.ConfigFilename;
+            var config = GetConfig(filename);
+
+            //TODO: use heartbeat interval from config
+            //TODO: Use SSL if set in config
+            var worker = new QueueWorker(config.RabbitMqHost, config.RabbitMqUsername, config.RabbitPassword, config.RabbitMqQueueName, messageHandler.HandleCommand, log);
             worker.Start();
 
             Console.Clear();
@@ -49,37 +53,16 @@ namespace GarageController
             Console.ReadLine();
 
             worker.Stop();
+        }
 
+        private static Config GetConfig(string filename)
+        {
+            if (!File.Exists(filename)) throw new FileNotFoundException();
 
-            //bool quit = false;
+            var raw = File.ReadAllText(filename);
+            var config = JsonConvert.DeserializeObject<Config>(raw);
 
-
-            //while (!quit)
-            //{
-            //    Console.WriteLine();
-            //    Console.WriteLine("Toggle Door 1: <1>");
-            //    Console.WriteLine("Toggle Door 2: <2>");
-            //    Console.WriteLine();
-            //    Console.WriteLine("End: <q>");
-            //    var key = Console.ReadKey(true);
-
-            //    switch (key.Key)
-            //    {
-            //        case ConsoleKey.Q:
-            //            quit = true;
-            //            break;
-            //        case ConsoleKey.D1:
-            //        case ConsoleKey.NumPad1:
-            //            controller.ToggleDoor1();
-            //            break;
-            //        case ConsoleKey.D2:
-            //        case ConsoleKey.NumPad2:
-            //            controller.ToggleDoor2();
-            //            break;
-            //    }
-            //    Console.WriteLine();
-            //    Console.WriteLine();
-            //}
+            return config;
         }
     }
 }
