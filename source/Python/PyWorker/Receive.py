@@ -10,16 +10,12 @@ def start_receiving(filename):
 
     with Connection(connection_string) as conn:
         with conn.Consumer(queue, callbacks=[process_message]) as consumer:
-            while True:
-                conn.drain_events()
-
-
-
-
-#    try:
-#        channel.start_consuming()
-#    except KeyboardInterrupt:
-#        channel.stop_comsuming()
+            running = True
+            while running:
+                try:
+                    conn.drain_events()
+                except KeyboardInterrupt:
+                    running = False
 
 
 def process_message(body, message):
@@ -28,5 +24,5 @@ def process_message(body, message):
 
 
 if __name__ == '__main__':
-    fileName = "D:\Settings.yaml"
+    fileName = "/Users/royveshovda/src/Settings.yaml"
     start_receiving(fileName)
