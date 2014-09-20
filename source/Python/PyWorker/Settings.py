@@ -1,11 +1,11 @@
-#import pyYAML
-
+import sys
 import yaml
 
-
-def main():
-    data = yaml.load()
-    print("Hello world!")
+def get_settings(filename):
+    f = open(filename, mode='rt', encoding='utf-8')
+    data = yaml.load(f.read())
+    f.close()
+    return data
 
 if __name__ == '__main__':
-    main()
+    get_settings(sys.argv[1])

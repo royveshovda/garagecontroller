@@ -1,26 +1,33 @@
 import pika
 from Settings import get_settings
 
-def main(fileName):
-    settings = get_settings(fileName)
+
+def start_receiving(filename):
+    settings = get_settings(filename)
     host = settings["RabbitMqHost"]
     username = settings["RabbitMqUsername"]
     password = settings["RabbitMqPassword"]
-    exchange = settings["RabbitMqCommandExchangeName"]
+    queue = settings["RabbitMqCommandQueueName"]
     credentials = pika.PlainCredentials(username, password)
     parameters = pika.ConnectionParameters(credentials=credentials,
                                            host=host)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
-    channel.basic_publish(exchange=exchange,
-                          routing_key='',
-                          body='Hello World, again!')
+    print(" [*] Waiting for messages. To exit press CTRL+C")
+    channel.basic_consume(callback, queue=queue)
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        channel.stop_comsuming()
 
     connection.close()
 
 
+def callback(ch, method, properties, body):
+    print(" [x] Received %r", body)
+
 
 if __name__ == '__main__':
     fileName = "D:\Settings.yaml"
-    main(fileName)
+    start_receiving(fileName)
