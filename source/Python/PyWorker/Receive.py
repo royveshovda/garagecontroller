@@ -1,5 +1,6 @@
 from Settings import get_settings
 from kombu import Connection, Queue
+from Parser import parse
 
 def start_receiving(filename):
     settings = get_settings(filename)
@@ -19,8 +20,13 @@ def start_receiving(filename):
 
 
 def process_message(body, message):
-    print(body)
+    session_id, door, created, expiry, signature = parse(body)
     message.ack()
+    print("SessionId: " + session_id)
+    print("Door: " + door)
+    print("Created: " + created)
+    print("Expiry: " + expiry)
+    print("Signature: " + signature)
 
 
 if __name__ == '__main__':

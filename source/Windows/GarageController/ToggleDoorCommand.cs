@@ -12,10 +12,10 @@ namespace GarageController
         public System.Int32 DoorNumber;
 
         [ProtoMember(3)]
-        public System.Int64 Created;
+        public System.String Created;
 
         [ProtoMember(4)]
-        public System.Int64? Expiry;
+        public System.String? Expiry;
                 
         [ProtoMember(5)]
         public System.String Signature;
