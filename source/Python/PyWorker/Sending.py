@@ -1,23 +1,18 @@
 import pika
+from kombu import Connection, Exchange
+
 from Settings import get_settings
 
 def main(fileName):
     settings = get_settings(fileName)
-    host = settings["RabbitMqHost"]
-    username = settings["RabbitMqUsername"]
-    password = settings["RabbitMqPassword"]
-    exchange = settings["RabbitMqCommandExchangeName"]
-    credentials = pika.PlainCredentials(username, password)
-    parameters = pika.ConnectionParameters(credentials=credentials,
-                                           host=host)
-    connection = pika.BlockingConnection(parameters)
-    channel = connection.channel()
+    connection_string = settings["RabbitMqConnectionString"]
+    exchange_name = settings["RabbitMqCommandExchangeName"]
 
-    channel.basic_publish(exchange=exchange,
-                          routing_key='',
-                          body='Hello World, again!')
+    exchange = Exchange(exchange_name)
 
-    connection.close()
+    with Connection(connection_string) as conn:
+        producer = conn.Producer()
+        producer.publish("Hello from within python3", exchange=exchange)
 
 
 
