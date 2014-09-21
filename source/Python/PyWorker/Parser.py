@@ -5,6 +5,7 @@ def parse(raw):
     data.setdefault("Signature", "")
     data.setdefault("Created", "")
     data.setdefault("Expiry", "")
+    data.setdefault("SessionId", "")
     SessionId = data["SessionId"]
     DoorNumber = data["DoorNumber"]
     Signature = data["Signature"]

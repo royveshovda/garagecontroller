@@ -1,6 +1,9 @@
+import sys
 from Settings import get_settings
 from kombu import Connection, Queue
 from Parser import parse
+import pifacedigitalio as piface
+from time import sleep
 
 def start_receiving(filename):
     settings = get_settings(filename)
@@ -20,15 +23,36 @@ def start_receiving(filename):
 
 
 def process_message(body, message):
-    session_id, door, created, expiry, signature = parse(body)
-    message.ack()
-    print("SessionId: " + session_id)
-    print("Door: " + door)
-    print("Created: " + created)
-    print("Expiry: " + expiry)
-    print("Signature: " + signature)
+    try:
+        session_id, door, created, expiry, signature = parse(body)
+        toggle_door(door)
+        message.ack()
+    except:
+        print("Error processing message: "+ body)
+    #print("SessionId: " + session_id)
+    #print("Door: " + door)
+    #print("Created: " + created)
+    #print("Expiry: " + expiry)
+    #print("Signature: " + signature)
+
+def toggle_door(door):
+    try:
+        iDoor = int(door)
+    except ValueError:
+        print("Door "+ door + " is not supported in this system")
+        return
+
+    if iDoor == 1 or iDoor == 2:
+        piface.init()
+        print("Door: " + door)
+        piface.digital_write(iDoor,1)
+        sleep(1)
+        piface.digital_write(iDoor,0)
+    else:
+        print("Door "+ door + " is not supported in this system")
 
 
 if __name__ == '__main__':
-    fileName = "/Users/royveshovda/src/Settings.yaml"
+    fileName = sys.argv[1]
+    #fileName = "/Users/royveshovda/src/Settings.yaml"
     start_receiving(fileName)
