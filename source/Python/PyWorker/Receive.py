@@ -16,6 +16,7 @@ def start_receiving(filename):
     with Connection(connection_string) as conn:
         with conn.Consumer(queue, callbacks=[process_message]) as consumer:
             running = True
+            print("Running\n")
             while running:
                 try:
                     conn.drain_events()
@@ -45,6 +46,7 @@ def toggle_door(door):
         return
 
     if idoor == 1 or idoor == 2:
+        idoor -= 1
         piface.init()
         print("Door: " + door)
         piface.digital_write(idoor, 1)
