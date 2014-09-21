@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using GarageController;
@@ -47,9 +48,10 @@ namespace GarageTester
             var cmd = new ToggleDoorCommand
             {
                 DoorNumber = 1,
-                Created = DateTime.Now.Ticks,
-                Expiry = DateTime.Now.AddSeconds(30).Ticks,
-                SessionId = Guid.NewGuid().ToString()
+                Created = DateTime.Now.ToString(CultureInfo.InvariantCulture),
+                Expiry = DateTime.Now.AddSeconds(30).ToString(CultureInfo.InvariantCulture),
+                SessionId = Guid.NewGuid().ToString(),
+                Signature = string.Empty
             };
 
             SendCommand(cmd);
@@ -60,9 +62,10 @@ namespace GarageTester
             var cmd = new ToggleDoorCommand
             {
                 DoorNumber = 2,
-                Created = DateTime.Now.Ticks,
-                Expiry = DateTime.Now.AddSeconds(30).Ticks,
-                SessionId = Guid.NewGuid().ToString()
+                Created = DateTime.Now.ToString(CultureInfo.InvariantCulture),
+                Expiry = DateTime.Now.AddSeconds(30).ToString(CultureInfo.InvariantCulture),
+                SessionId = Guid.NewGuid().ToString(),
+                Signature = string.Empty
             };
 
             SendCommand(cmd);
@@ -82,16 +85,22 @@ namespace GarageTester
             }
         }
 
+        //private static byte[] SerializeToggleDoorCommand(ToggleDoorCommand command)
+        //{
+        //    byte[] serialized;
+        //    using (var mso = new MemoryStream())
+        //    {
+        //        ProtoBuf.Serializer.Serialize(mso, command);
+        //        mso.Position = 0;
+        //        serialized = mso.ToArray();
+        //    }
+        //    return serialized;
+        //}
+
         private static byte[] SerializeToggleDoorCommand(ToggleDoorCommand command)
         {
-            byte[] serialized;
-            using (var mso = new MemoryStream())
-            {
-                ProtoBuf.Serializer.Serialize(mso, command);
-                mso.Position = 0;
-                serialized = mso.ToArray();
-            }
-            return serialized;
+            var text = JsonConvert.SerializeObject(command);
+            return System.Text.Encoding.UTF8.GetBytes(text);
         }
 
         private IBasicProperties GetMessageProperties(int doorNumber, string dataType)

@@ -15,7 +15,7 @@ namespace GarageController
         public System.String Created;
 
         [ProtoMember(4)]
-        public System.String? Expiry;
+        public System.String Expiry;
                 
         [ProtoMember(5)]
         public System.String Signature;

@@ -31,11 +31,6 @@ def process_message(body, message):
         message.ack()
     except:
         print("Error processing message: " + body)
-        # print("SessionId: " + session_id)
-        #print("Door: " + door)
-        #print("Created: " + created)
-        #print("Expiry: " + expiry)
-        #print("Signature: " + signature)
 
 
 def toggle_door(door):
@@ -48,7 +43,7 @@ def toggle_door(door):
     if idoor == 1 or idoor == 2:
         idoor -= 1
         piface.init()
-        print("Door: " + door)
+        print("Door: " + str(door))
         piface.digital_write(idoor, 1)
         sleep(1)
         piface.digital_write(idoor, 0)
