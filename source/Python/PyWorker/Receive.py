@@ -1,4 +1,4 @@
-import sys
+import sys, signal
 from Settings import get_settings
 from kombu import Connection, Queue
 from Parser import parse
@@ -42,16 +42,30 @@ def toggle_door(door):
 
     if idoor == 1 or idoor == 2:
         idoor -= 1
-        piface.init()
         print("Door: " + str(door))
-        piface.digital_write(idoor, 1)
-        sleep(1)
-        piface.digital_write(idoor, 0)
+        toogle_door_piface(idoor)
     else:
         print("Door " + door + " is not supported in this system")
 
 
+def toogle_door_piface(door):
+    piface.init()
+    piface.digital_write(door, 1)
+    sleep(1)
+    piface.digital_write(door, 0)
+
+
+def set_exit_handler(func):
+    signal.signal(signal.SIGTERM, func)
+
+
+def on_exit(sig, func=None):
+    print("exit handler triggered")
+    sys.exit(1)
+
+
 if __name__ == '__main__':
+    set_exit_handler(on_exit)
     fileName = sys.argv[1]
     # fileName = "/Users/royveshovda/src/Settings.yaml"
     start_receiving(fileName)
