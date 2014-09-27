@@ -2,9 +2,13 @@ import sys, signal
 from Settings import get_settings
 from kombu import Connection, Queue
 from Parser import parse
-import pifacedigitalio as piface
+import pifacedigitalio as pi_face
 from time import sleep
 
+
+# TODO: Send error to separate channel
+# TODO: Log to file in case of missing communication
+# TODO: Send heartbeat on regular basis
 
 def start_receiving(filename):
     settings = get_settings(filename)
@@ -35,24 +39,24 @@ def process_message(body, message):
 
 def toggle_door(door):
     try:
-        idoor = int(door)
+        integer_door = int(door)
     except ValueError:
         print("Door " + door + " is not supported in this system")
         return
 
-    if idoor == 1 or idoor == 2:
-        idoor -= 1
+    if integer_door == 1 or integer_door == 2:
+        integer_door -= 1
         print("Door: " + str(door))
-        toogle_door_piface(idoor)
+        toggle_door_pi_face(integer_door)
     else:
         print("Door " + door + " is not supported in this system")
 
 
-def toogle_door_piface(door):
-    piface.init()
-    piface.digital_write(door, 1)
+def toggle_door_pi_face(door):
+    pi_face.init()
+    pi_face.digital_write(door, 1)
     sleep(1)
-    piface.digital_write(door, 0)
+    pi_face.digital_write(door, 0)
 
 
 def set_exit_handler(func):

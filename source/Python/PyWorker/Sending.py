@@ -1,10 +1,9 @@
-import pika
 from kombu import Connection, Exchange
-
 from Settings import get_settings
 
-def main(fileName):
-    settings = get_settings(fileName)
+
+def main(filename):
+    settings = get_settings(filename)
     connection_string = settings["RabbitMqConnectionString"]
     exchange_name = settings["RabbitMqCommandExchangeName"]
 
@@ -13,7 +12,6 @@ def main(fileName):
     with Connection(connection_string) as conn:
         producer = conn.Producer()
         producer.publish("Hello from within python3", exchange=exchange)
-
 
 
 if __name__ == '__main__':
