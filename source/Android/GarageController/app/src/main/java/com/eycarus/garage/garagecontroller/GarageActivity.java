@@ -7,10 +7,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class GarageActivity extends Activity {
@@ -19,9 +23,6 @@ public class GarageActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_garage);
-
-        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        //StrictMode.setThreadPolicy(policy);
 
         final Button buttonLeft = (Button) findViewById(R.id.button_left);
         buttonLeft.setOnClickListener(new View.OnClickListener() {
@@ -37,7 +38,6 @@ public class GarageActivity extends Activity {
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -59,7 +59,6 @@ public class GarageActivity extends Activity {
     }
 
     private class Worker extends AsyncTask {
-
         private int _door =0;
         public Worker(int door) {
             _door = door;
@@ -72,35 +71,47 @@ public class GarageActivity extends Activity {
         }
     }
 
-    private void connect() {
-    }
-
     private void sendButtonCommand(int buttonNumber) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("rv-broker.cloudapp.net");
         factory.setUsername("tester");
-        factory.setPassword("GoGoTester");
+        factory.setPassword("GoGoTester91234");
         factory.setPort(5672);
-        //factory.setRequestedHeartbeat(30);
-
-        GarageControllerMessages.ToggleDoorCommand msg = GarageControllerMessages.ToggleDoorCommand.newBuilder().setDoorNumber(buttonNumber).build();
-        byte[] body = msg.toByteArray();
 
         try {
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
-            //String message = "Door " + buttonNumber;
-            channel.basicPublish("", "GarageKorvettveien7",null,body);
+
+            JSONObject message = new JSONObject();
+            try {
+                message.put("SessionId", "1");
+                message.put("DoorNumber", buttonNumber);
+                message.put("Signature", "SIGN");
+            } catch (JSONException e) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(GarageActivity.this, "Command FAILED!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            channel.basicPublish("Commands", "",null,message.toString().getBytes());
             channel.close();
             connection.close();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(GarageActivity.this, "Command sent!", Toast.LENGTH_SHORT).show();
+                }
+            });
         } catch (Exception e) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(GarageActivity.this, "Command FAILED!", Toast.LENGTH_SHORT).show();
+                }
+            });
             e.printStackTrace();
         }
-
-
-
-
-        //TODO: Contruct Command and send
     }
-
 }
