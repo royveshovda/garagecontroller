@@ -12,11 +12,9 @@ from Settings import get_settings
 from Parser import parse
 
 
-
-# TODO: Send error to separate channel
-# TODO: Log to file in case of missing communication
-
 def start_receiving(filename):
+    # TODO: Send error to separate channel
+    # TODO: Log to file in case of missing communication
     settings = get_settings(filename)
     connection_string = settings["RabbitMqConnectionString"]
     queue_name = settings["RabbitMqDeviceQueueName"]
