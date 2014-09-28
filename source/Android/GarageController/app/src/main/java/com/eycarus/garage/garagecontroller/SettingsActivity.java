@@ -101,29 +101,20 @@ public class SettingsActivity extends PreferenceActivity {
         // Add 'general' preferences.
         addPreferencesFromResource(R.xml.pref_general);
 
-        // Add 'notifications' preferences, and a corresponding header.
-        PreferenceCategory fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_notifications);
-        getPreferenceScreen().addPreference(fakeHeader);
-        addPreferencesFromResource(R.xml.pref_notification);
+        // Add 'general' preferences.
+        addPreferencesFromResource(R.xml.pref_rabbitmq);
 
-        // Add 'data and sync' preferences, and a corresponding header.
-        fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_data_sync);
-        getPreferenceScreen().addPreference(fakeHeader);
-        addPreferencesFromResource(R.xml.pref_data_sync);
+
 
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(findPreference("example_text"));
-        bindPreferenceSummaryToValue(findPreference("example_list"));
-        bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-        bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-        //bindPreferenceSummaryToValue(findPreference("Host"));
-        //bindPreferenceSummaryToValue(findPreference("Exchange"));
-        //bindPreferenceSummaryToValue(findPreference("Username"));
-        //bindPreferenceSummaryToValue(findPreference("Password"));
+        bindPreferenceSummaryToValue(findPreference("settings_display_name"));
+
+        bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_host"));
+        bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_username"));
+        bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_password"));
+        bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_command_exchange"));
     }
 
     /** {@inheritDoc} */
@@ -183,29 +174,6 @@ public class SettingsActivity extends PreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-
-            } else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
-
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -251,46 +219,26 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
+            bindPreferenceSummaryToValue(findPreference("settings_display_name"));
         }
     }
 
-    /**
-     * This fragment shows notification preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
+    public static class RabbitMqPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_notification);
+            addPreferencesFromResource(R.xml.pref_general);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-        }
-    }
+            bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_host"));
+            bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_username"));
+            bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_password"));
+            bindPreferenceSummaryToValue(findPreference("settings_rabbitmq_command_exchange"));
 
-    /**
-     * This fragment shows data and sync preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
         }
     }
 }

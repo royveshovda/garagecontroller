@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="settings_rabbitmq_host"
+        android:title="@string/pref_rabbitmq_host_title"
+        android:defaultValue="@string/pref_rabbitmq_host_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textCapWords"
+        android:capitalize="words"
+        android:singleLine="true"
+        android:maxLines="1" />
+    <EditTextPreference
+        android:key="settings_rabbitmq_username"
+        android:title="@string/pref_rabbitmq_username_title"
+        android:defaultValue="@string/pref_rabbitmq_username_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textCapWords"
+        android:capitalize="words"
+        android:singleLine="true"
+        android:maxLines="1" />
+    <EditTextPreference
+        android:key="settings_rabbitmq_password"
+        android:title="@string/pref_rabbitmq_password_title"
+        android:defaultValue="@string/pref_rabbitmq_password_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textCapWords"
+        android:capitalize="words"
+        android:singleLine="true"
+        android:maxLines="1" />
+    <EditTextPreference
+        android:key="settings_rabbitmq_command_exchange"
+        android:title="@string/pref_rabbitmq_command_exchange_title"
+        android:defaultValue="@string/pref_rabbitmq_command_exchange_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textCapWords"
+        android:capitalize="words"
+        android:singleLine="true"
+        android:maxLines="1" />
+</PreferenceScreen>

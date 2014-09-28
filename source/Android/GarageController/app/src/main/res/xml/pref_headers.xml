@@ -7,11 +7,7 @@
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.eycarus.garage.garagecontroller.SettingsActivity$NotificationPreferenceFragment"
-        android:title="@string/pref_header_notifications" />
-
-    <header
-        android:fragment="com.eycarus.garage.garagecontroller.SettingsActivity$DataSyncPreferenceFragment"
-        android:title="@string/pref_header_data_sync" />
+        android:fragment="com.eycarus.garage.garagecontroller.SettingsActivity$RabbitMqPreferenceFragment"
+        android:title="@string/pref_header_rabbitmq" />
 
 </preference-headers>

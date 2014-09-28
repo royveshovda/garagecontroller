@@ -2,8 +2,10 @@ package com.eycarus.garage.garagecontroller;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -81,9 +83,11 @@ public class GarageActivity extends Activity {
 
     private void sendButtonCommand(int buttonNumber) {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("rv-broker.cloudapp.net");
-        factory.setUsername("tester");
-        factory.setPassword("GoGoTester91234");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        factory.setHost(preferences.getString("settings_rabbitmq_host",""));
+        factory.setUsername(preferences.getString("settings_rabbitmq_username",""));
+        factory.setPassword(preferences.getString("settings_rabbitmq_password",""));
         factory.setPort(5672);
 
         try {
@@ -94,7 +98,7 @@ public class GarageActivity extends Activity {
             try {
                 message.put("SessionId", "1");
                 message.put("DoorNumber", buttonNumber);
-                message.put("Signature", "SIGN");
+                message.put("Signature", preferences.getString("settings_display_name","???"));
             } catch (JSONException e) {
                 runOnUiThread(new Runnable() {
                     public void run() {
