@@ -30,11 +30,11 @@ def start_receiving(filename):
                 heartbeat = datetime.datetime.utcnow()
                 while running:
                     temp_heartbeat = datetime.datetime.utcnow()
-                    if (temp_heartbeat - heartbeat).total_seconds() > 120:
+                    if (temp_heartbeat - heartbeat).total_seconds() > 30:
                         heartbeat = temp_heartbeat
                         send_heartbeat(producer, device_id)
                     try:
-                        conn.drain_events(timeout=20)
+                        conn.drain_events(timeout=5)
                     except KeyboardInterrupt:
                         running = False
                     except socket.timeout:
