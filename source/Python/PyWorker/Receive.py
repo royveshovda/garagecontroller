@@ -1,31 +1,51 @@
-import sys, signal
-from Settings import get_settings
-from kombu import Connection, Queue
-from Parser import parse
-import pifacedigitalio as pi_face
+import socket
+import datetime
+import sys
+import signal
 from time import sleep
+
+from kombu import Connection, Queue
+from kombu.pools import producers
+import pifacedigitalio as pi_face
+
+from Settings import get_settings
+from Parser import parse
+
 
 
 # TODO: Send error to separate channel
 # TODO: Log to file in case of missing communication
-# TODO: Send heartbeat on regular basis
 
 def start_receiving(filename):
     settings = get_settings(filename)
     connection_string = settings["RabbitMqConnectionString"]
-    queue_name = settings["RabbitMqCommandQueueName"]
+    queue_name = settings["RabbitMqDeviceQueueName"]
+    device_id = settings["DeviceId"]
 
     queue = Queue(queue_name)
 
     with Connection(connection_string) as conn:
         with conn.Consumer(queue, callbacks=[process_message]) as consumer:
-            running = True
-            print("Running\n")
-            while running:
-                try:
-                    conn.drain_events()
-                except KeyboardInterrupt:
-                    running = False
+            with producers[conn].acquire(block=True) as producer:
+                running = True
+                print("Running\n")
+                heartbeat = datetime.datetime.utcnow()
+                while running:
+                    temp_heartbeat = datetime.datetime.utcnow()
+                    if (temp_heartbeat - heartbeat).total_seconds() > 120:
+                        heartbeat = temp_heartbeat
+                        send_heartbeat(producer, device_id)
+                    try:
+                        conn.drain_events(timeout=20)
+                    except KeyboardInterrupt:
+                        running = False
+                    except socket.timeout:
+                        running = True
+
+
+def send_heartbeat(producer, device_id):
+    message = "Heartbeat: " + datetime.datetime.utcnow().isoformat()
+    producer.publish(message, exchange="GarageKorvettveien7_X", routing_key=device_id)
 
 
 def process_message(body, message):

@@ -1,6 +1,7 @@
 package com.eycarus.garage.garagecontroller;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -51,11 +52,18 @@ public class GarageActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
+        boolean handled = true;
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+
+        switch(id){
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            default:
+                handled = super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+        return handled;
     }
 
     private class Worker extends AsyncTask {

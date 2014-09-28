@@ -24,4 +24,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.rabbitmq:amqp-client:3.3.5'
     compile 'com.google.protobuf:protobuf-java:2.5.0'
+    compile 'com.android.support:support-v4:20.0.0'
 }
