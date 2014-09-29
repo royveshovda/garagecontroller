@@ -57,6 +57,7 @@ def start_receiving(filename):
 def reconnect(local_connection):
     if not local_connection.connected:
         local_connection.connect()
+        local_connection.ensure_connection()
 
 def send_heartbeat(producer, device_id):
     message = "Heartbeat: " + datetime.datetime.utcnow().isoformat()
