@@ -25,33 +25,42 @@ def start_receiving(filename):
 
     with Connection(connection_string, heartbeat=20) as conn:
         reconnect(conn)
-        worker = Worker(conn, queue)
-        try:
-            print("Running")
-            worker.run()
-        except KeyboardInterrupt:
-            print("Exiting")
+        # worker = Worker(conn, queue)
+        # try:
+        #     print("Running")
+        #     worker.run()
+        #     print("Here?")
+        # except KeyboardInterrupt:
+        #     print("Exiting")
+
+        with conn.Consumer(queue, callbacks=[process_message]) as consumer:
+            with producers[conn].acquire(block=True) as producer:
+                #drain = conn.ensure(consumer, conn.drain_events(), errback=errback)
+                running = True
+                print("Running\n")
+                heartbeat = datetime.datetime.utcnow()
+                consumer.consume()
+                while running:
+                    reconnect(conn)
+                    temp_heartbeat = datetime.datetime.utcnow()
+                    if (temp_heartbeat - heartbeat).total_seconds() > 30:
+                        heartbeat = temp_heartbeat
+                        send_heartbeat(producer, device_id)
+                    try:
+                        conn.heartbeat_check()
+                        conn.drain_events(timeout=9)
+                        #drain()
+                    except KeyboardInterrupt:
+                        running = False
+                    except socket.timeout:
+                        running = True
+                    except ConnectionResetError:
+                        reconnect(conn)
+                        running = True
 
 
-        # with conn.Consumer(queue, callbacks=[process_message]) as consumer:
-        #     with producers[conn].acquire(block=True) as producer:
-        #         running = True
-        #         print("Running\n")
-        #         heartbeat = datetime.datetime.utcnow()
-        #         consumer.consume()
-        #         while running:
-        #             reconnect(conn)
-        #             temp_heartbeat = datetime.datetime.utcnow()
-        #             if (temp_heartbeat - heartbeat).total_seconds() > 30:
-        #                 heartbeat = temp_heartbeat
-        #                 send_heartbeat(producer, device_id)
-        #             try:
-        #                 conn.drain_events(timeout=9)
-        #             except KeyboardInterrupt:
-        #                 running = False
-        #             except socket.timeout:
-        #                 #conn.heartbeat_check()
-        #                 running = True
+def errback(exc, interval):
+    print("Couldn't publish message: %r. Retry in %ds" % (exc, interval))
 
 
 def reconnect(local_connection):
@@ -108,10 +117,13 @@ class Worker(ConsumerMixin):
     def __init__(self, connection, queue):
         self.connection = connection
         self.queue = queue
+        self.connect_max_retries = 10
 
     def get_consumers(self, Consumer, channel):
+        cons = Consumer(self.queue, callbacks=[process_message], accept=['json'])
+        cons.qos()
         return [
-            Consumer(self.queue, callbacks=[process_message], accept=['json']),
+            cons,
         ]
 
 
