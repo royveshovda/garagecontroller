@@ -7,7 +7,7 @@ from time import sleep
 from kombu import Connection, Queue
 from kombu.mixins import ConsumerMixin
 from kombu.pools import producers
-#import pifacedigitalio as pi_face
+import pifacedigitalio as pi_face
 
 from Settings import get_settings
 from Parser import parse
@@ -25,14 +25,6 @@ def start_receiving(filename):
 
     with Connection(connection_string, heartbeat=20) as conn:
         reconnect(conn)
-        # worker = Worker(conn, queue)
-        # try:
-        #     print("Running")
-        #     worker.run()
-        #     print("Here?")
-        # except KeyboardInterrupt:
-        #     print("Exiting")
-
         with conn.Consumer(queue, callbacks=[process_message]) as consumer:
             with producers[conn].acquire(block=True) as producer:
                 #drain = conn.ensure(consumer, conn.drain_events(), errback=errback)
@@ -49,7 +41,6 @@ def start_receiving(filename):
                     try:
                         conn.heartbeat_check()
                         conn.drain_events(timeout=9)
-                        #drain()
                     except KeyboardInterrupt:
                         running = False
                     except socket.timeout:
@@ -67,6 +58,7 @@ def reconnect(local_connection):
     if not local_connection.connected:
         local_connection.connect()
         local_connection.ensure_connection()
+
 
 def send_heartbeat(producer, device_id):
     message = "Heartbeat: " + datetime.datetime.utcnow().isoformat()
@@ -92,16 +84,16 @@ def toggle_door(door):
     if integer_door == 1 or integer_door == 2:
         integer_door -= 1
         print("Door: " + str(door))
-        #toggle_door_pi_face(integer_door)
+        toggle_door_pi_face(integer_door)
     else:
         print("Door " + door + " is not supported in this system")
 
 
-#def toggle_door_pi_face(door):
-#    pi_face.init()
-#    pi_face.digital_write(door, 1)
-#    sleep(1)
-#    pi_face.digital_write(door, 0)
+def toggle_door_pi_face(door):
+    pi_face.init()
+    pi_face.digital_write(door, 1)
+    sleep(1)
+    pi_face.digital_write(door, 0)
 
 
 def set_exit_handler(func):
@@ -130,5 +122,4 @@ class Worker(ConsumerMixin):
 if __name__ == '__main__':
     set_exit_handler(on_exit)
     fileName = sys.argv[1]
-    # fileName = "/Users/royveshovda/src/Settings.yaml"
     start_receiving(fileName)
