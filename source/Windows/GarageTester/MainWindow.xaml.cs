@@ -13,7 +13,7 @@ namespace GarageTester
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private ConnectionFactory _connectionFactory;
         private IConnection _connection;
@@ -127,6 +127,7 @@ namespace GarageTester
             return _model.IsOpen;
         }
 
+// ReSharper disable once UnusedMethodReturnValue.Local
         private bool Connect()
         {
             if (_config.RabbitMqUseSsl)
@@ -162,6 +163,7 @@ namespace GarageTester
                     return _model != null && _model.IsOpen;
                 }
             }
+// ReSharper disable once EmptyGeneralCatchClause
             catch (Exception)
             { }
             return false;  // Failed to create connection

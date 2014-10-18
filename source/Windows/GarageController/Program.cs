@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using GarageController.Properties;
-using log4net;
-using log4net.Config;
 using Newtonsoft.Json;
 
 namespace GarageController
@@ -32,11 +30,8 @@ namespace GarageController
 
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            var log = LogManager.GetLogger(typeof(Program));
-            XmlConfigurator.Configure();
-
             var messageHandler = new MessageHandler();
 
             var filename = Settings.Default.ConfigFilename;
@@ -44,6 +39,7 @@ namespace GarageController
 
             //TODO: use heartbeat interval from config
             //TODO: Use SSL if set in config
+            var log = new ConsoleLogger();
             var worker = new QueueWorker(config.RabbitMqHost, config.RabbitMqUsername, config.RabbitPassword, config.RabbitMqQueueName, messageHandler.HandleCommand, log);
             worker.Start();
 

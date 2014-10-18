@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using log4net;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.MessagePatterns;
@@ -33,7 +32,7 @@ namespace GarageController
             Initialize();
         }
 
-        protected override void Initialize()
+        protected override sealed void Initialize()
         {
             _factory = new ConnectionFactory
             {
@@ -68,8 +67,7 @@ namespace GarageController
                         }
                         catch (Exception error)
                         {
-                            //TODO: Handle error
-                            //Log.Error("Error handling message: ", error);
+                            Log.Error("Error handling message: ", error);
                         }
                         finally
                         {
@@ -79,12 +77,12 @@ namespace GarageController
                 }
                 catch (RabbitMQ.Client.Exceptions.OperationInterruptedException ex)
                 {
-                    //Log.Error("Broker operation was interrupted.", ex);
+                    Log.Error("Broker operation was interrupted.", ex);
                     DisposeAllConnectionObjects();
                 }
                 catch (Exception error)
                 {
-                    //Log.Error("Broker experienced unknown error.", error);
+                    Log.Error("Broker experienced unknown error.", error);
                     DisposeAllConnectionObjects();
                 }
             }
@@ -114,7 +112,7 @@ namespace GarageController
                 }
                 catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException error)
                 {
-                    //Log.Error("Not able to conenct to Broker.", error);
+                    Log.Error("Not able to conenct to Broker.", error);
                     Thread.Sleep(5000);
                 }
                 _brokerChannel = _brokerConnection.CreateModel();
@@ -152,6 +150,7 @@ namespace GarageController
                 {
                     _brokerConnection.Dispose();
                 }
+// ReSharper disable once EmptyGeneralCatchClause
                 catch { }
                 _brokerConnection = null;
             }

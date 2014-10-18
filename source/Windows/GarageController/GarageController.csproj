@@ -36,9 +36,6 @@
     <StartupObject>GarageController.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -61,7 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="ILog.cs" />
     <Compile Include="LongRunningProcess.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="Program.cs" />

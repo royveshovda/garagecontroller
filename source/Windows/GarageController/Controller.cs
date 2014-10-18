@@ -9,14 +9,14 @@ namespace GarageController
     public class Controller
     {
         private readonly InterfaceKit _interfaceKit;
-        private bool isOpen = false;
+        private bool _isOpen;
         public Controller()
         {
             _interfaceKit = new InterfaceKit();
 
-            _interfaceKit.Attach += new AttachEventHandler(ifKit_Attach);
-            _interfaceKit.Detach += new DetachEventHandler(ifKit_Detach);
-            _interfaceKit.Error += new ErrorEventHandler(ifKit_Error);
+            _interfaceKit.Attach += ifKit_Attach;
+            _interfaceKit.Detach += ifKit_Detach;
+            _interfaceKit.Error += ifKit_Error;
 
             _interfaceKit.open();
         }
@@ -24,7 +24,7 @@ namespace GarageController
         public void ToggleDoor1()
         {
             Console.WriteLine("Door 1 toggled");
-            if (isOpen)
+            if (_isOpen)
             {
                 _interfaceKit.outputs[0] = true;
                 Thread.Sleep(800);
@@ -35,7 +35,7 @@ namespace GarageController
         public void ToggleDoor2()
         {
             Console.WriteLine("Door 2 toggled");
-            if (isOpen)
+            if (_isOpen)
             {
                 _interfaceKit.outputs[1] = true;
                 Thread.Sleep(800);
@@ -48,7 +48,7 @@ namespace GarageController
         //fields to display as well as determine the range of values for input sensitivity slider
         void ifKit_Attach(object sender, AttachEventArgs e)
         {
-            isOpen = true;
+            _isOpen = true;
             var interfaceKit = (InterfaceKit)sender;
             //TODO: Log event
 
@@ -83,7 +83,7 @@ namespace GarageController
         //We will also clear the display fields and hide the inputs and outputs.
         void ifKit_Detach(object sender, DetachEventArgs e)
         {
-            isOpen = false;
+            _isOpen = false;
             //var interfaceKit = (InterfaceKit)sender;
 
             const string message1 = "InterfaceKit detached";
@@ -94,7 +94,7 @@ namespace GarageController
         //Error event handler
         void ifKit_Error(object sender, ErrorEventArgs e)
         {
-            isOpen = false;
+            _isOpen = false;
             /*
             Phidget phid = (Phidget)sender;
             switch (e.Type)
