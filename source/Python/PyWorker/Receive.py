@@ -20,6 +20,7 @@ def start_receiving(filename):
     connection_string = settings["RabbitMqConnectionString"]
     queue_name = settings["RabbitMqDeviceQueueName"]
     device_id = settings["DeviceId"]
+    exchange = settings["RabbitMqDeviceResponseExchangeName"]
 
     queue = Queue(queue_name)
 
@@ -27,7 +28,6 @@ def start_receiving(filename):
         reconnect(conn)
         with conn.Consumer(queue, callbacks=[process_message]) as consumer:
             with producers[conn].acquire(block=True) as producer:
-                #drain = conn.ensure(consumer, conn.drain_events(), errback=errback)
                 running = True
                 print("Running\n")
                 heartbeat = datetime.datetime.utcnow()
@@ -37,7 +37,7 @@ def start_receiving(filename):
                     temp_heartbeat = datetime.datetime.utcnow()
                     if (temp_heartbeat - heartbeat).total_seconds() > 30:
                         heartbeat = temp_heartbeat
-                        send_heartbeat(producer, device_id)
+                        send_heartbeat(producer, device_id, exchange)
                     try:
                         conn.heartbeat_check()
                         conn.drain_events(timeout=9)
@@ -50,22 +50,19 @@ def start_receiving(filename):
                         running = True
 
 
-def errback(exc, interval):
-    print("Couldn't publish message: %r. Retry in %ds" % (exc, interval))
-
-
 def reconnect(local_connection):
     if not local_connection.connected:
         local_connection.connect()
         local_connection.ensure_connection()
 
 
-def send_heartbeat(producer, device_id):
+def send_heartbeat(producer, device_id, exchange):
     message = "Heartbeat: " + datetime.datetime.utcnow().isoformat()
-    producer.publish(message, exchange="GarageKorvettveien7_X", routing_key=device_id)
+    producer.publish(message, exchange=exchange, routing_key=device_id)
 
 
 def process_message(body, message):
+    # noinspection PyBroadException
     try:
         session_id, door, created, expiry, signature = parse(body)
         toggle_door(door)
@@ -100,6 +97,7 @@ def set_exit_handler(func):
     signal.signal(signal.SIGTERM, func)
 
 
+# noinspection PyUnusedLocal
 def on_exit(sig, func=None):
     print("exit handler triggered")
     sys.exit(1)
@@ -111,8 +109,8 @@ class Worker(ConsumerMixin):
         self.queue = queue
         self.connect_max_retries = 10
 
-    def get_consumers(self, Consumer, channel):
-        cons = Consumer(self.queue, callbacks=[process_message], accept=['json'])
+    def get_consumers(self, consumer, channel):
+        cons = consumer(self.queue, callbacks=[process_message], accept=['json'])
         cons.qos()
         return [
             cons,
