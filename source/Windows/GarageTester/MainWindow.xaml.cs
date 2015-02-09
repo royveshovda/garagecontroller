@@ -164,8 +164,10 @@ namespace GarageTester
                 }
             }
 // ReSharper disable once EmptyGeneralCatchClause
-            catch (Exception)
-            { }
+            catch (Exception error)
+            {
+                MessageBox.Show("Error connecting to RabbitMQ: " + error.Message);
+            }
             return false;  // Failed to create connection
         }
 

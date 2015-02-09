@@ -21,6 +21,7 @@ def start_receiving(filename):
     queue_name = settings["RabbitMqDeviceQueueName"]
     device_id = settings["DeviceId"]
     exchange = settings["RabbitMqDeviceResponseExchangeName"]
+    heartbeat_interval_in_seconds = int(settings["HeartbeatIntervalInSeconds"])
 
     queue = Queue(queue_name)
 
@@ -35,7 +36,7 @@ def start_receiving(filename):
                 while running:
                     reconnect(conn)
                     temp_heartbeat = datetime.datetime.utcnow()
-                    if (temp_heartbeat - heartbeat).total_seconds() > 30:
+                    if (temp_heartbeat - heartbeat).total_seconds() > heartbeat_interval_in_seconds:
                         heartbeat = temp_heartbeat
                         send_heartbeat(producer, device_id, exchange)
                     try:
@@ -67,8 +68,9 @@ def process_message(body, message):
         session_id, door, created, expiry, signature = parse(body)
         toggle_door(door)
         message.ack()
-    except:
+    except Exception as err:
         print("Error processing message: " + body)
+        print("Error: {0}".format(err))
 
 
 def toggle_door(door):
