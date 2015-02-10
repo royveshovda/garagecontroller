@@ -3,6 +3,7 @@ import datetime
 import sys
 import signal
 from time import sleep
+from amqp import RecoverableConnectionError
 
 from kombu import Connection, Queue
 from kombu.mixins import ConsumerMixin
@@ -25,36 +26,56 @@ def start_receiving(filename):
 
     queue = Queue(queue_name)
 
-    with Connection(connection_string, heartbeat=20) as conn:
-        reconnect(conn)
-        with conn.Consumer(queue, callbacks=[process_message]) as consumer:
-            with producers[conn].acquire(block=True) as producer:
-                running = True
-                print("Running\n")
-                heartbeat = datetime.datetime.utcnow()
-                consumer.consume()
-                while running:
-                    reconnect(conn)
-                    temp_heartbeat = datetime.datetime.utcnow()
-                    if (temp_heartbeat - heartbeat).total_seconds() > heartbeat_interval_in_seconds:
-                        heartbeat = temp_heartbeat
-                        send_heartbeat(producer, device_id, exchange)
-                    try:
-                        conn.heartbeat_check()
-                        conn.drain_events(timeout=9)
-                    except KeyboardInterrupt:
-                        running = False
-                    except socket.timeout:
-                        running = True
-                    except ConnectionResetError:
-                        reconnect(conn)
-                        running = True
+    running = True
+    heartbeat = datetime.datetime(1970, 1, 1)
+
+    while running:
+        with Connection(connection_string, heartbeat=(heartbeat_interval_in_seconds * 2)) as conn:
+            reconnect(conn)
+            while running:
+                try:
+                    with conn.Consumer(queue, callbacks=[process_message]) as consumer:
+                        with producers[conn].acquire(block=True) as producer:
+                            log_info("Running")
+                            consumer.consume()
+                            while running:
+                                try:
+                                    reconnect(conn)
+                                    temp_heartbeat = datetime.datetime.utcnow()
+                                    if (temp_heartbeat - heartbeat).total_seconds() > heartbeat_interval_in_seconds:
+                                        send_heartbeat(producer, device_id, exchange)
+                                        log_info("Heartbeat: {0}".format(temp_heartbeat))
+                                        heartbeat = temp_heartbeat
+                                    conn.heartbeat_check()
+                                    conn.drain_events(timeout=1)
+                                except KeyboardInterrupt:
+                                    running = False
+                                except socket.timeout:
+                                    pass
+                                except ConnectionResetError:
+                                    log_error("ConnectionResetError")
+                                    reconnect(conn)
+                except RecoverableConnectionError:
+                    log_error("RecoverableConnectionError")
+                except BrokenPipeError:
+                    log_error("BrokenPipeError")
+                except TimeoutError:
+                    log_error("TimeoutError")
 
 
 def reconnect(local_connection):
     if not local_connection.connected:
         local_connection.connect()
         local_connection.ensure_connection()
+    local_connection.heartbeat_check()
+
+
+def log_info(message):
+    print("INFO: {0}".format(message))
+
+
+def log_error(message):
+    print("Error: {0}".format(message))
 
 
 def send_heartbeat(producer, device_id, exchange):
